@@ -5,9 +5,9 @@
 node : 20.12.2
 npm : 10.5.0
 
-# Install sequelize-cli-typescript globally using npm
+# Install Pakages using npm
 
-npm install --save-dev sequelize-cli
+npm install
 
 ## Create, migrate and seed database using below commands
 
