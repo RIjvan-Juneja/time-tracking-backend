@@ -163,3 +163,21 @@ exports.deleteTask = async (req, res) => {
   }
 }
 
+exports.getTasksByCategory = async (req, res) => {
+  try {
+    const userId = req.user;
+    const category_id = req.params.id || 0;
+
+    const tasks = await Tasks.findAll({
+      where: { user_id: userId, category_id },
+      include: [{ model: Attachments }],
+    });
+
+    return res.json(tasks);
+
+  } catch (error) {
+    console.log(error);
+    return res.send("error")
+  }
+}
+
