@@ -1,12 +1,12 @@
 const express = require("express");
-// const userRoutes = require("./render.router");
-
+const taskRouter = require("./tasks.route");
 const router = express.Router();
 
-// router.use('/', userRoutes);
+router.use('/task', taskRouter);
 router.use('/', (req,res) =>{
   res.send('Home Page')
 })
+
 
 
 module.exports = router;
