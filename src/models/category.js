@@ -17,6 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'category',
     paranoid: true,
     deletedAt: 'deleted_at',
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
   });
 
   return category;
