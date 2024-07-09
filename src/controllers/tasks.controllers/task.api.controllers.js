@@ -1,3 +1,5 @@
+const { STATUS_MESSAGE, STATUS_CODE } = require("../../helpers/constants/statuscode");
+const { generalResponse } = require("../../helpers/response/general.response");
 const db = require("../../models/index");
 const Tasks = db.tasks;
 const Attachments = db.attachments;
@@ -27,7 +29,11 @@ exports.getTasks = async (req, res) => {
 }
 
 exports.addTask = async (req, res) => {
+  console.log(req.body);
+  console.log(req.file);
+
   const t = await db.sequelize.transaction();
+
 
   try {
     const userId = req.user;
@@ -37,13 +43,13 @@ exports.addTask = async (req, res) => {
         user_id: userId,
         title: req.body.title || null,
         description: req.body.description || null,
-        category_id: req.body.category_id || null,
+        category_id: req.body.category || null,
       },
 
       attachments: {
-        file_type: req.body.file_type || "null",
-        file_name: req.body.file_name || "null",
-        path: req.body.file_url || "null",
+        file_type: req.file.mimetype || "null",
+        file_name: req.file.originalname || "null",
+        path: req.file.path || "null",
       }
     }
 
@@ -58,12 +64,12 @@ exports.addTask = async (req, res) => {
 
     await t.commit();
 
-    return res.send("Task and Attachment added successfully")
+    return generalResponse(res,null,'Task and Attachment added successfully',STATUS_MESSAGE.SUCCESS,true,STATUS_CODE.CREATED)
 
   } catch (error) {
     console.log(error);
     await t.rollback();
-    return res.send("error")
+    return generalResponse(res,null,error,STATUS_MESSAGE.ERROR,true,STATUS_CODE.ERROR)
   }
 
 }
