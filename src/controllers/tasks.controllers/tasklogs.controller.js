@@ -2,7 +2,9 @@ const { STATUS_MESSAGE, STATUS_CODE } = require("../../helpers/constants/statusc
 const { generalResponse } = require("../../helpers/response/general.response");
 const db = require("../../models/index");
 const TaskLog = db.tasks_time_logs;
-const { startOfDay, endOfDay, differenceInMinutes } = require('date-fns');
+const { Op } = require('sequelize');
+const { startOfDay, startOfToday, endOfToday, endOfDay, differenceInMinutes } = require('date-fns');
+
 // console.log(db.tasks_time_logs);
 // exports.getTasks = async (req, res) => {
 //   try {
@@ -28,9 +30,59 @@ const { startOfDay, endOfDay, differenceInMinutes } = require('date-fns');
 //   }
 // }
 
+exports.getLogsById = async (req,res) => {
+  console.log("called");
+  try {
+    const task_id = req.params.id || 0;
+    const user_id = req.user || 0;
+
+    const todayStart = startOfToday();
+    const todayEnd = endOfToday();
+
+    const taskLogs = await TaskLog.findAll({
+      where: {
+        task_id,
+        user_id,
+        [Op.or]: [
+          {
+            start_datetime: {
+              [Op.between]: [todayStart, todayEnd],
+            },
+          },
+          {
+            end_datetime: {
+              [Op.between]: [todayStart, todayEnd],
+            },
+          },
+          {
+            [Op.and]: [
+              {
+                start_datetime: {
+                  [Op.lte]: todayEnd,
+                },
+              },
+              {
+                end_datetime: {
+                  [Op.is]: null,
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+    console.log(taskLogs);
+    return generalResponse(res, taskLogs, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
+
+  } catch (error) {
+    console.error(error);
+    return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
+    // res.status(500).json({ error: 'An error occurred while fetching data' });
+  }
+}
 
 exports.addTaskTimeLog = async (req, res) => {
-  console.log("called",req.body);
+  console.log("called", req.body);
   try {
     const userId = req.user;
     const taskId = req.body.task_id;
@@ -65,7 +117,7 @@ exports.addTaskTimeLog = async (req, res) => {
         where: {
           task_id: taskId,
           user_id: userId,
-          start_datetime: { [db.Sequelize.Op.gte]: startOfDay(new Date()) },
+          start_datetime: { [db.Sequelize.Op.ne]: null },
           end_datetime: null,
         },
       });
@@ -87,11 +139,11 @@ exports.addTaskTimeLog = async (req, res) => {
   }
 }
 
-exports.lastLog = async () => {
+exports.lastLog = async (req,res) => {
 
   try {
     const userId = req.user;
-    const taskId = req.body.task_id;
+    const taskId = req.params.id || 0;
 
     const lastLog = await TaskLog.findOne({
       where: {
@@ -102,10 +154,10 @@ exports.lastLog = async () => {
       order: [['id', 'DESC']],
     });
 
-    if (!lastLog) {
-      return generalResponse(res, 'end', 'No active task found for this user and task', STATUS_MESSAGE.ERROR, true, STATUS_CODE.NOT_FOUND);
+    if (lastLog) {
+      return generalResponse(res, 'end', 'task is running', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.FETCH);
     } else {
-      return generalResponse(res, 'start', null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
+      return generalResponse(res, 'start', 'task is paused', STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
     }
 
   } catch (error) {
