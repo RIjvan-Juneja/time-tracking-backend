@@ -23,6 +23,9 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'tasks_time_logs',
     tableName: 'tasks_time_logs',
     paranoid: true,
+    createdAt : 'created_at',
+    updatedAt : 'updated_at',
+    timestamps: false,  // This will remove createdAt and updatedAt columns from the table.
     deletedAt: 'deleted_at',
   });
 
