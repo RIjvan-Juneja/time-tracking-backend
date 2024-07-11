@@ -1,12 +1,12 @@
 const express = require("express");
 const authMiddleware = require("../middleware/authenticatio.middlwware/auth.middleware");
-const { addTaskTimeLog, lastLog } = require("../controllers/tasks.controllers/tasklogs.controller");
+const { addTaskTimeLog, lastLog, getLogsById } = require("../controllers/tasks.controllers/tasklogs.controller");
+const { reportData } = require("../controllers/tasks.controllers/report.controllers");
 const taskLogRouter = express.Router();
 
 taskLogRouter.post('/api/insert/log',authMiddleware,addTaskTimeLog);
-taskLogRouter.post('/api/check/lastlog',authMiddleware, lastLog); 
-// taskRouter.post('/api/add',authMiddleware,parser.parser.single('attachment'),addTask);
-// taskRouter.post('/api/edit',authMiddleware,editTask);
-// taskRouter.post('/api/delete/:id',authMiddleware,deleteTask);
+taskLogRouter.post('/api/check/lastlog/:id',authMiddleware, lastLog); 
+taskLogRouter.post('/api/logs/:id',authMiddleware, getLogsById); 
+taskLogRouter.post('/api/report',authMiddleware, reportData); 
 
 module.exports = taskLogRouter;
