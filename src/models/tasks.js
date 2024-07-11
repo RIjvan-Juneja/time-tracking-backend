@@ -21,6 +21,8 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'tasks',
     tableName: 'tasks',
+    createdAt : 'created_at',
+    updatedAt : 'updated_at',
     paranoid: true,
     deletedAt: 'deleted_at',
   });

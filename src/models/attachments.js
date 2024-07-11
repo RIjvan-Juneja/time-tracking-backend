@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'attachments',
     tableName: 'attachments',
     paranoid: true,
+    createdAt: 'created_at',
+    updatedAt: false,
     deletedAt: 'deleted_at',
   });
 
