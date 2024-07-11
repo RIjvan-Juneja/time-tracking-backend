@@ -10,21 +10,21 @@ exports.getTasks = async (req, res) => {
     if (req.params.id) {
       const tasks = await Tasks.findOne({
         where: { id: req.params.id, user_id: userId },
-        include: [{ model: Attachments }],
+        include: [{ model: Attachments }, { model : db.tasks }, { model : db.tasks_time_logs }],
       });
-      return res.json(tasks);
+      return generalResponse(res,tasks,null,STATUS_MESSAGE.SUCCESS,false,STATUS_CODE.FETCH);
     } else {
 
       const tasks = await Tasks.findAll({
         where: { user_id: userId },
-        include: [{ model: Attachments }],
+        include: [{ model: Attachments }, { model : db.category }, { model : db.tasks_time_logs }],
       });
-      return res.json(tasks);
+      return generalResponse(res,tasks,null,STATUS_MESSAGE.SUCCESS,false,STATUS_CODE.FETCH);
     }
 
   } catch (error) {
     console.log(error);
-    return res.send("error")
+    return rgeneralResponse(res,null,'Internal Server Error',STATUS_MESSAGE.ERROR,true,STATUS_CODE.ERROR)
   }
 }
 
@@ -98,7 +98,6 @@ exports.editTask = async (req, res) => {
     }
 
     const hasTask = await Tasks.findOne({ where: { id: task_id, user_id: userId } });
-    console.log(hasTask);
 
     if (hasTask) {
       await Tasks.update(payload.tasksData, {
@@ -133,6 +132,7 @@ exports.editTask = async (req, res) => {
 }
 
 exports.deleteTask = async (req, res) => {
+  console.log("deleted Called");
   const t = await db.sequelize.transaction();
 
   try {
@@ -157,15 +157,15 @@ exports.deleteTask = async (req, res) => {
       await t.commit();
 
     } else {
-      return res.send("Task Not Found")
+      return generalResponse(res,null,'Data Not Found',STATUS_MESSAGE.NOT_FOUND,true,STATUS_CODE.NOT_FOUND)
     }
-
-    return res.send("Task and Attachment deleted")
+    
+    return generalResponse(res,null,'Task and Attachment deleted',STATUS_MESSAGE.DELETED,true,STATUS_CODE.DELETE)
 
   } catch (error) {
     console.log(error);
     await t.rollback();
-    return res.send("error")
+    return generalResponse(res,null,'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }
 

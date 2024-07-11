@@ -10,6 +10,7 @@ exports.STATUS_MESSAGE = {
 
 exports.STATUS_CODE = {
   CREATED: 201,
+  FETCH : 200,
   UPDATE: 200,
   DELETE: 200,
   ERROR: 500,
