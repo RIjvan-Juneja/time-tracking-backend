@@ -100,7 +100,7 @@ exports.addTaskTimeLog = async (req, res) => {
       });
 
       if (existingLog) {
-        return generalResponse(res, null, 'Task is already started', STATUS_MESSAGE.FAILED, true, STATUS_CODE.CONFLICT);
+        return generalResponse(res, null, 'Task is already started', STATUS_MESSAGE.ERROR, true, 400);
       }
 
       const payload = {
@@ -108,6 +108,8 @@ exports.addTaskTimeLog = async (req, res) => {
         task_id: taskId,
         start_datetime: new Date(),
       };
+
+      console.log(payload,"**************payload***********");
 
       await TaskLog.create(payload);
 

@@ -79,7 +79,6 @@ exports.addTask = async (req, res) => {
 exports.editTask = async (req, res) => {
   const t = await db.sequelize.transaction();
 
-  console.log(req.body,"******************************************");
 
   try {
     const userId = req.user;

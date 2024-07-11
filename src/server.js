@@ -7,7 +7,7 @@ const HOST = process.env.HOST || 'localhost';
 require('dotenv').config();
 
 const app = express();
-app.use(cors({ credentials: true, origin: ["http://localhost:5173"] }));
+app.use(cors({ credentials: true, origin: ["http://localhost:5173","http://192.168.22.71:5173"] }));
 // app.use(cors({ credentials: true, origin: "*" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
