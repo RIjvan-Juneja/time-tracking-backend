@@ -10,21 +10,21 @@ exports.getTasks = async (req, res) => {
     if (req.params.id) {
       const tasks = await Tasks.findOne({
         where: { id: req.params.id, user_id: userId },
-        include: [{ model: Attachments }, { model : db.tasks }, { model : db.tasks_time_logs }],
+        include: [{ model: Attachments }, { model: db.category }, { model: db.tasks_time_logs }],
       });
-      return generalResponse(res,tasks,null,STATUS_MESSAGE.SUCCESS,false,STATUS_CODE.FETCH);
+      return generalResponse(res, tasks, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
     } else {
 
       const tasks = await Tasks.findAll({
         where: { user_id: userId },
-        include: [{ model: Attachments }, { model : db.category }, { model : db.tasks_time_logs }],
+        include: [{ model: Attachments }, { model: db.category }, { model: db.tasks_time_logs }],
       });
-      return generalResponse(res,tasks,null,STATUS_MESSAGE.SUCCESS,false,STATUS_CODE.FETCH);
+      return generalResponse(res, tasks, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
     }
 
   } catch (error) {
     console.log(error);
-    return rgeneralResponse(res,null,'Internal Server Error',STATUS_MESSAGE.ERROR,true,STATUS_CODE.ERROR)
+    return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }
 
@@ -47,9 +47,9 @@ exports.addTask = async (req, res) => {
       },
 
       attachments: {
-        file_type: req.file.mimetype || "null",
-        file_name: req.file.originalname || "null",
-        path: req.file.path || "null",
+        file_type: (req.file?.mimetype)? req.file.mimetype : null,
+        file_name: (req.file?.originalname)? req.file.originalname : null,
+        path: (req.file?.path)? req.file.path : null,
       }
     }
 
@@ -60,22 +60,26 @@ exports.addTask = async (req, res) => {
     payload.attachments.task_id = taskInserted.id;
 
     // add attachment with task id
-    await Attachments.create(payload.attachments, { transaction: t });
+    if(payload?.attachments.path){
+      await Attachments.create(payload.attachments, { transaction: t });
+    }
 
     await t.commit();
 
-    return generalResponse(res,null,'Task and Attachment added successfully',STATUS_MESSAGE.SUCCESS,true,STATUS_CODE.CREATED)
+    return generalResponse(res, null, 'Task and Attachment added successfully', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.CREATED)
 
   } catch (error) {
     console.log(error);
     await t.rollback();
-    return generalResponse(res,null,error,STATUS_MESSAGE.ERROR,true,STATUS_CODE.ERROR)
+    return generalResponse(res, null, error, STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 
 }
 
 exports.editTask = async (req, res) => {
   const t = await db.sequelize.transaction();
+
+  console.log(req.body,"******************************************");
 
   try {
     const userId = req.user;
@@ -91,9 +95,9 @@ exports.editTask = async (req, res) => {
 
       attachments: {
         task_id,
-        file_type: req.body.file_type || "null",
-        file_name: req.body.file_name || "null",
-        path: req.body.file_url || "null",
+        file_type: (req.file?.mimetype)? req.file.mimetype : null,
+        file_name: (req.file?.originalname)? req.file.originalname : null,
+        path: (req.file?.path)? req.file.path : null,
       }
     }
 
@@ -107,13 +111,15 @@ exports.editTask = async (req, res) => {
       }, { transaction: t });
 
       // Soft delete the attachment
-      await Attachments.destroy({
-        where: {
-          task_id: task_id,
-        },
-      }, { transaction: t });
+      if (payload?.attachments.path) {
+        await Attachments.destroy({
+          where: {
+            task_id: task_id,
+          },
+        }, { transaction: t });
 
-      await Attachments.create(payload.attachments, { transaction: t });
+        await Attachments.create(payload.attachments, { transaction: t });
+      }
 
       await t.commit();
 
@@ -121,12 +127,12 @@ exports.editTask = async (req, res) => {
       return res.send("Task Not Found")
     }
 
-    return res.send("Task and Attachment added edited")
+    return generalResponse(res, null, 'Task and Attachment added edited', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.SUCCESS)
 
   } catch (error) {
     console.log(error);
     await t.rollback();
-    return res.send("error")
+    return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 
 }
@@ -157,15 +163,15 @@ exports.deleteTask = async (req, res) => {
       await t.commit();
 
     } else {
-      return generalResponse(res,null,'Data Not Found',STATUS_MESSAGE.NOT_FOUND,true,STATUS_CODE.NOT_FOUND)
+      return generalResponse(res, null, 'Data Not Found', STATUS_MESSAGE.NOT_FOUND, true, STATUS_CODE.NOT_FOUND)
     }
-    
-    return generalResponse(res,null,'Task and Attachment deleted',STATUS_MESSAGE.DELETED,true,STATUS_CODE.DELETE)
+
+    return generalResponse(res, null, 'Task and Attachment deleted', STATUS_MESSAGE.DELETED, true, STATUS_CODE.DELETE)
 
   } catch (error) {
     console.log(error);
     await t.rollback();
-    return generalResponse(res,null,'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
+    return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }
 
