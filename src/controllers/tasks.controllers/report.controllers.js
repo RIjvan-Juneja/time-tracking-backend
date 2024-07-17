@@ -1,4 +1,4 @@
-const { startOfDay, startOfMonth, startOfYear, endOfDay, endOfMonth, endOfYear, format } = require('date-fns');
+const { startOfDay, startOfMonth,subDays, startOfYear, endOfDay, endOfMonth, endOfYear, format } = require('date-fns');
 const db = require("../../models/index");
 const { Op } = require('sequelize');
 const { generalResponse } = require('../../helpers/response/general.response');
@@ -8,7 +8,7 @@ const tasks_time_logs = db.tasks_time_logs;
 
 exports.reportData = async (req, res) => {
   try {
-    const  reportType = req.body.reportType;
+    const reportType = req.body.reportType;
     const userId = req.user;
     let startDate, endDate;
 
@@ -38,18 +38,18 @@ exports.reportData = async (req, res) => {
             [Op.between]: [startDate, endDate]
           }
         },
-        required: true 
+        required: true
       },
       {
         model: db.category,
         attributes: ['name']
       }
-    ]
+      ]
     });
 
     const formattedReport = reportData.map(task => ({
-      id : task.id,
-      category_name : task.category.name,
+      id: task.id,
+      category_name: task.category.name,
       title: task.title,
       totalHours: task.tasks_time_logs.reduce((acc, log) => acc + log.duration, 0)
     }));
@@ -59,5 +59,44 @@ exports.reportData = async (req, res) => {
   } catch (error) {
     console.error('Error generating report:', error);
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
+  }
+}
+
+exports.daycompare = async (req, res) => {
+  const userId = req.user;
+
+  try {
+    const today = new Date();
+    const yesterday = subDays(today, 1);
+
+    const todayTasks = await tasks.count({
+      where: {
+        user_id: userId,
+        created_at: {
+          [Op.between]: [startOfDay(today), endOfDay(today)]
+        }
+      }
+    });
+
+    const yesterdayTasks = await tasks.count({
+      where: {
+        user_id: userId,
+        created_at: {
+          [Op.between]: [startOfDay(yesterday), endOfDay(yesterday)]
+        }
+      }
+    });
+
+    console.log(todayTasks,yesterdayTasks);
+
+    res.json({
+      todayTasks,
+      yesterdayTasks
+    });
+
+  } catch (error) {
+
+    res.status(500).json({ error: error.message });
+
   }
 }

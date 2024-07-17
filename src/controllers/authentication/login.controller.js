@@ -8,11 +8,10 @@ const jwt = require('jsonwebtoken');
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters long" })
+  password: z.string().min(5, { message: "Password must be at least 6 characters long" })
 });
 
 exports.login = async (req, res) => {
-  // console.log("called",req.body);
   try {
 
     loginSchema.parse(req.body);
