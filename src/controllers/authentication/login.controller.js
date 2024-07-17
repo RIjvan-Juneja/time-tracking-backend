@@ -12,12 +12,14 @@ const loginSchema = z.object({
 });
 
 exports.login = async (req, res) => {
+  // console.log("called",req.body);
   try {
+
     loginSchema.parse(req.body);
 
     const { email, password } = req.body;
 
-    const user = await Users.findOne({ where: { email } });
+    const user = await Users.findOne({ where: { email }, include: { model: db.roles } });
     if (!user) {
       return generalResponse(res, null, 'Invalid email or password', STATUS_MESSAGE.UNAUTHORIZED, true, STATUS_CODE.UNAUTHORIZED)
     }
@@ -29,7 +31,7 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign({ id: user.id, roleId: user.role_id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
-    return generalResponse(res, token, 'Login successful', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.SUCCESS);
+    return generalResponse(res, { name : user.first_name,role: user.role.role_name, token }, 'Login successful', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.SUCCESS);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return generalResponse(res, error, 'Please Enter Valid Input', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)

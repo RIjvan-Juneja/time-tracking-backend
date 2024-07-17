@@ -5,8 +5,8 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     
     const roles = [
-      { role_name: 'Admin' },
-      { role_name: 'employee' },
+      { role_name: 'admin' },
+      { role_name: 'user' },
     ];
 
     await queryInterface.bulkInsert('roles', roles, {});
