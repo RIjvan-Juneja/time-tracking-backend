@@ -1,4 +1,4 @@
-const { startOfDay, startOfMonth,subDays, startOfYear, endOfDay, endOfMonth, endOfYear, format } = require('date-fns');
+const { startOfDay, startOfMonth, subDays, startOfYear, endOfDay, endOfMonth, endOfYear, format, subMonths } = require('date-fns');
 const db = require("../../models/index");
 const { Op } = require('sequelize');
 const { generalResponse } = require('../../helpers/response/general.response');
@@ -69,34 +69,73 @@ exports.daycompare = async (req, res) => {
     const today = new Date();
     const yesterday = subDays(today, 1);
 
-    const todayTasks = await tasks.count({
+    const todayTasks = await tasks_time_logs.count({
       where: {
         user_id: userId,
-        created_at: {
+        start_datetime: {
           [Op.between]: [startOfDay(today), endOfDay(today)]
         }
       }
     });
 
-    const yesterdayTasks = await tasks.count({
+    const yesterdayTasks = await tasks_time_logs.count({
       where: {
         user_id: userId,
-        created_at: {
+        start_datetime: {
           [Op.between]: [startOfDay(yesterday), endOfDay(yesterday)]
         }
       }
     });
 
-    console.log(todayTasks,yesterdayTasks);
 
-    res.json({
+    return generalResponse(res, {
       todayTasks,
       yesterdayTasks
-    });
+    }, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
+
 
   } catch (error) {
 
-    res.status(500).json({ error: error.message });
+    console.log(error);
+    return generalResponse(res, { todayTasks: 0, yesterdayTasks: 0 }, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
 
+  }
+}
+
+exports.monthlyprogress = async (req, res) => {
+  userId = req.user
+  try {
+    const today = new Date();
+    const thisMonthStart = startOfMonth(today);
+    const thisMonthEnd = endOfMonth(today);
+    const lastMonthStart = startOfMonth(subMonths(today, 1));
+    const lastMonthEnd = endOfMonth(subMonths(today, 1));
+
+    const thisMonthTasks = await tasks_time_logs.count({
+      where: {
+        user_id: userId,
+        start_datetime: {
+          [Op.between]: [thisMonthStart, thisMonthEnd]
+        }
+      }
+    });
+
+    const lastMonthTasks = await tasks_time_logs.count({
+      where: {
+        user_id: userId,
+        start_datetime: {
+          [Op.between]: [lastMonthStart, lastMonthEnd]
+        }
+      }
+    });
+
+    return generalResponse(res, {
+      thisMonthTasks,
+      lastMonthTasks
+    }, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
+
+  } catch (error) {
+    console.log(error);
+    return generalResponse(res, { thisMonthTasks: 0, thisMonthTasks: 0 }, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }

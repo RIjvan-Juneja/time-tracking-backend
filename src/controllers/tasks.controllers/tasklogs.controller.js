@@ -5,31 +5,6 @@ const TaskLog = db.tasks_time_logs;
 const { Op } = require('sequelize');
 const { startOfDay, startOfToday, endOfToday, endOfDay, differenceInMinutes } = require('date-fns');
 
-// console.log(db.tasks_time_logs);
-// exports.getTasks = async (req, res) => {
-//   try {
-//     const userId = req.user;
-//     if (req.params.id) {
-//       const tasks = await Tasks.findOne({
-//         where: { id: req.params.id, user_id: userId },
-//         include: [{ model: Attachments }, { model : db.tasks }],
-//       });
-//       return generalResponse(res,tasks,null,STATUS_MESSAGE.SUCCESS,false,STATUS_CODE.FETCH);
-//     } else {
-
-//       const tasks = await Tasks.findAll({
-//         where: { user_id: userId },
-//         include: [{ model: Attachments }, { model : db.category }],
-//       });
-//       return generalResponse(res,tasks,null,STATUS_MESSAGE.SUCCESS,false,STATUS_CODE.FETCH);
-//     }
-
-//   } catch (error) {
-//     console.log(error);
-//     return rgeneralResponse(res,null,'Internal Server Error',STATUS_MESSAGE.ERROR,true,STATUS_CODE.ERROR)
-//   }
-// }
-
 exports.getLogsById = async (req,res) => {
   console.log("called");
   try {
@@ -167,24 +142,24 @@ exports.lastLog = async (req,res) => {
   }
 }
 
-// Check if the last task log is a start
-// const lastLog = await TaskLog.findOne({
-//   where: {
-//     task_id: taskId,
-//     user_id: userId,
-//     end_datetime: null,
-//   },
-//   order: [['id', 'DESC']],
-// });
+exports.runningTask = async (req,res) => {
+  try {
+    const userId = req.user;
 
-// if (lastLog) {
-//   // If the last log is a start, return a message indicating that the task is already started
-//   return generalResponse(res, null, 'Task is already started', STATUS_MESSAGE.FAILED, true, STATUS_CODE.CONFLICT);
-// } else {
-//   // If the last log is not a start, create a new start log
-//   const payload = {
-//     user_id: userId,
-//     task_id: taskId,
-//     start_datetime: new Date(),
-//   };
+    const runningTask = await TaskLog.findAll({
+      where: {
+        user_id: userId,
+        end_datetime: null,
+      }
+    });
 
+    if (runningTask) {
+      return generalResponse(res, runningTask, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
+    } else {
+      return generalResponse(res, [], 'No active task found for this user and task', STATUS_MESSAGE.ERROR, true, STATUS_CODE.NOT_FOUND);
+    }
+    
+  } catch (error) {
+    return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
+  }
+}

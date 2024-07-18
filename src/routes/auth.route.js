@@ -6,7 +6,7 @@ const authRouter = express.Router();
 
 authRouter.post('/api/registation', registration);
 authRouter.post('/api/login', login);
-authRouter.post('/api/checkrole', checkrole);
+// authRouter.post('/api/checkrole', checkrole);
 
 
 module.exports = authRouter;
