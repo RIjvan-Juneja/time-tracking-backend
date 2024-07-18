@@ -3,6 +3,8 @@ const { generalResponse } = require("../../helpers/response/general.response");
 const db = require("../../models/index");
 const bcrypt = require('bcryptjs');
 const Users = db.users;
+const Roles = db.roles;
+
 const { z } = require('zod');
 
 const registrationSchema = z.object({
@@ -33,8 +35,16 @@ exports.registration = async (req, res) => {
     registrationSchema.parse(req.body);
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const simpleUser = await Roles.findOne({
+      where: {
+        role_name: 'user',
+      },
+      attributes: ['id']
+    })
+
     await Users.create({
-      role_id: 1,
+      role_id: simpleUser.id,
       first_name,
       last_name,
       email,

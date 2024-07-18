@@ -43,7 +43,7 @@ exports.addTask = async (req, res) => {
         user_id: userId,
         title: req.body.title || null,
         description: req.body.description || null,
-        category_id: req.body.category || null,
+        category_id: req.body.category_id || null,
       },
 
       attachments: {

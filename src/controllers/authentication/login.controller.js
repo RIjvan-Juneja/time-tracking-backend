@@ -30,7 +30,7 @@ exports.login = async (req, res) => {
 
     const token = jwt.sign({ id: user.id, roleId: user.role_id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
-    return generalResponse(res, { name : user.first_name,role: user.role.role_name, token }, 'Login successful', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.SUCCESS);
+    return generalResponse(res, { name: user.first_name, role: user.role.role_name, token }, 'Login successful', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.SUCCESS);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return generalResponse(res, error, 'Please Enter Valid Input', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
