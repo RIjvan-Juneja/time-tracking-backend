@@ -21,14 +21,7 @@ const registrationSchema = z.object({
 })
 
 exports.registration = async (req, res) => {
-  const {
-    first_name,
-    last_name,
-    email,
-    gender,
-    mobile_number,
-    password,
-  } = req.body;
+  const { first_name, last_name, email, gender, mobile_number, password } = req.body;
 
   try {
 

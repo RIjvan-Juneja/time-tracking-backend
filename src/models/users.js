@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     gender: DataTypes.STRING,
     mobile_number: DataTypes.STRING,
+    otp: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'users',

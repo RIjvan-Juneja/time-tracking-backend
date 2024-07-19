@@ -40,6 +40,7 @@ module.exports = {
       mobile_number: {
         type: Sequelize.STRING,
       },
+      otp: Sequelize.STRING,
       created_at: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
