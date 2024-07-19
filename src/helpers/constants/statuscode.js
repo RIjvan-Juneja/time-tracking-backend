@@ -27,8 +27,6 @@ exports.ERROR_MESSAGE = {
   PASSWORD_NOT_MATCH: 'Password does not match',
   NOT_ENOUGH_PERMISSIONS: 'Not enough permissions to perform this action',
   WRONG_CREDENTIALS: 'Wrong credentials',
-  NOT_ENOUGH_TIME: 'Not enough time to perform this action',
-  NOT_ENOUGH_STORAGE: 'Not enough storage to perform this action',
 }
 
 exports.ERROR_CODE = {

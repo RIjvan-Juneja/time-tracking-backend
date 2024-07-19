@@ -4,6 +4,7 @@ const db = require("../../models/index");
 const bcrypt = require('bcryptjs');
 const Users = db.users;
 const { z } = require('zod');
+const { sendEmail } = require("../../services/sendmail");
 
 const generateOtpSchema = z.object({
   email: z.string().min(1).email(),
@@ -26,6 +27,14 @@ exports.generateOtp = async (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000);
     await Users.update({ otp }, { where: { email: req.body.email } });
+    html = `
+    <h2>Hi ${user.first_name},</h2>
+    </br>
+    <p>You requested a password reset for your Time Tracking account. Please use the following OTP to reset your password: ${otp}</p>
+    `;
+
+    // send otp in  mail 
+    await sendEmail(req.body.email,'Time Tracking','forgot password',html);
 
     return generalResponse(res, { otp }, 'OTP sent successfully', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.SUCCESS);
   } catch (error) {
