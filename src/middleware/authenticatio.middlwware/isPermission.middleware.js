@@ -1,35 +1,29 @@
-const { users, roles, permissions } = require('../../models/index');
+const { STATUS_MESSAGE, STATUS_CODE } = require('../../helpers/constants/statuscode');
+const { generalResponse } = require('../../helpers/response/general.response');
+const { users, roles } = require('../../models/index');
 
 const isPermission = (requiredPermissions) => {
   return async (req, res, next) => {
     try {
-      const userId = req.user; 
+      const userId = req.user;
       const user = await users.findByPk(userId, {
         include: {
           model: roles,
-          include: {
-            model: permissions,
-            through: { attributes: [] } 
-          }
         }
       });
 
       if (!user) {
-        return res.status(403).json({ message: 'User not found' });
+        return generalResponse(res, null, 'User Not Found', STATUS_MESSAGE.UNAUTHORIZED, false, STATUS_CODE.UNAUTHORIZED)
       }
 
-      const userPermissions = user.role.permissions.map(permission => permission.name);
-
-      const hasPermission = requiredPermissions.every(permission => userPermissions.includes(permission));
-
-      if (!hasPermission) {
-        return res.status(403).json({ message: 'Access denied' });
+      if (!requiredPermissions.includes(user.role.role_name)) {
+        return generalResponse(res, null, 'Unauthorized User', STATUS_MESSAGE.UNAUTHORIZED, false, STATUS_CODE.UNAUTHORIZED)
       }
 
       next();
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Internal server error' });
+      return generalResponse(res, null, 'Internal server error', STATUS_MESSAGE.ERROR, false, STATUS_CODE.ERROR)
     }
   };
 };

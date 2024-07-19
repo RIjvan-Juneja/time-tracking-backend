@@ -10,10 +10,10 @@ const taskRouter = express.Router();
 
 taskRouter.post('/api/getTasks',authMiddleware,getTasks);
 taskRouter.post('/api/getTasks/:id',authMiddleware, getTasks); 
-taskRouter.post('/api/add',authMiddleware,parser.parser.single('attachment'),addTask);
-taskRouter.post('/api/edit',authMiddleware,parser.parser.single('attachment'),editTask);
-taskRouter.post('/api/delete/:id',authMiddleware,deleteTask);
-taskRouter.post('/api/daycompare',authMiddleware,daycompare);
-taskRouter.post('/api/monthlyprogress',authMiddleware,monthlyprogress);
+taskRouter.post('/api/add',authMiddleware,isPermission(['user']),parser.parser.single('attachment'),addTask);
+taskRouter.post('/api/edit',authMiddleware,isPermission(['user']),parser.parser.single('attachment'),editTask);
+taskRouter.post('/api/delete/:id',authMiddleware,isPermission(['user']),deleteTask);
+taskRouter.post('/api/daycompare',authMiddleware,isPermission(['user']),daycompare);
+taskRouter.post('/api/monthlyprogress',authMiddleware,isPermission(['user']),monthlyprogress);
 
 module.exports = taskRouter;
