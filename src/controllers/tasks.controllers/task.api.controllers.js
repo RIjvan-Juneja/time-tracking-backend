@@ -29,11 +29,8 @@ exports.getTasks = async (req, res) => {
 }
 
 exports.addTask = async (req, res) => {
-  console.log(req.body);
-  console.log(req.file);
 
   const t = await db.sequelize.transaction();
-
 
   try {
     const userId = req.user;
@@ -47,9 +44,9 @@ exports.addTask = async (req, res) => {
       },
 
       attachments: {
-        file_type: (req.file?.mimetype)? req.file.mimetype : null,
-        file_name: (req.file?.originalname)? req.file.originalname : null,
-        path: (req.file?.path)? req.file.path : null,
+        file_type: (req.file?.mimetype) ? req.file.mimetype : null,
+        file_name: (req.file?.originalname) ? req.file.originalname : null,
+        path: (req.file?.path) ? req.file.path : null,
       }
     }
 
@@ -60,7 +57,7 @@ exports.addTask = async (req, res) => {
     payload.attachments.task_id = taskInserted.id;
 
     // add attachment with task id
-    if(payload?.attachments.path){
+    if (payload?.attachments.path) {
       await Attachments.create(payload.attachments, { transaction: t });
     }
 
@@ -94,9 +91,9 @@ exports.editTask = async (req, res) => {
 
       attachments: {
         task_id,
-        file_type: (req.file?.mimetype)? req.file.mimetype : null,
-        file_name: (req.file?.originalname)? req.file.originalname : null,
-        path: (req.file?.path)? req.file.path : null,
+        file_type: (req.file?.mimetype) ? req.file.mimetype : null,
+        file_name: (req.file?.originalname) ? req.file.originalname : null,
+        path: (req.file?.path) ? req.file.path : null,
       }
     }
 
@@ -184,11 +181,28 @@ exports.getTasksByCategory = async (req, res) => {
       include: [{ model: Attachments }],
     });
 
-    return res.json(tasks);
+    return generalResponse(res, tasks, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
 
   } catch (error) {
     console.log(error);
-    return res.send("error")
+    return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }
 
+exports.getCategories = async (req, res) => {
+  try {
+
+    const categories = await db.category.findAll();
+
+    const formattedCategories = categories.map(category => ({
+      value: category.id,
+      label: category.name,
+    }));
+
+    return generalResponse(res, formattedCategories, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
+
+  } catch (error) {
+    console.log(error);
+    return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
+  }
+}

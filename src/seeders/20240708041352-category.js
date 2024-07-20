@@ -4,9 +4,9 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     const categorys = [
-      { name: 'personal' },
-      { name: 'work' },
-      { name: 'team_work' },
+      { name: 'Personal' },
+      { name: 'Work' },
+      { name: 'Team Work' },
     ];
 
     await queryInterface.bulkInsert('category', categorys, {});
