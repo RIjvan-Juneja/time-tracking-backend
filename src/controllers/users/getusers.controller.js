@@ -38,7 +38,7 @@ exports.activeUsers = async (req, res) => {
 
     return generalResponse(res, activeUsersCount, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return generalResponse(res, 0, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 };
@@ -75,7 +75,7 @@ exports.userProgressChart = async (req, res) => {
 
     return generalResponse(res,userStats,null,STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH)
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return generalResponse(res, [], 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }

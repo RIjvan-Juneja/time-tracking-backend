@@ -1,6 +1,7 @@
 const { STATUS_MESSAGE, STATUS_CODE } = require('../../helpers/constants/statuscode');
 const { generalResponse } = require('../../helpers/response/general.response');
 const { users, roles } = require('../../models/index');
+const logger = require("../../config/pino.config");
 
 const isPermission = (requiredPermissions) => {
   return async (req, res, next) => {
@@ -22,7 +23,7 @@ const isPermission = (requiredPermissions) => {
 
       next();
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       return generalResponse(res, null, 'Internal server error', STATUS_MESSAGE.ERROR, false, STATUS_CODE.ERROR)
     }
   };

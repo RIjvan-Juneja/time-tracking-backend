@@ -5,6 +5,8 @@ const { generalResponse } = require('../../helpers/response/general.response');
 const { STATUS_MESSAGE, STATUS_CODE } = require('../../helpers/constants/statuscode');
 const tasks = db.tasks;
 const tasks_time_logs = db.tasks_time_logs;
+const logger = require("../../config/pino.config");
+
 
 exports.reportData = async (req, res) => {
   try {
@@ -57,7 +59,7 @@ exports.reportData = async (req, res) => {
     return generalResponse(res, formattedReport, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
 
   } catch (error) {
-    console.error('Error generating report:', error);
+    logger.error('Error generating report:', error);
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }
@@ -96,7 +98,7 @@ exports.daycompare = async (req, res) => {
 
   } catch (error) {
 
-    console.log(error);
+    logger.error(error);
     return generalResponse(res, { todayTasks: 0, yesterdayTasks: 0 }, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
 
   }
@@ -135,7 +137,7 @@ exports.monthlyprogress = async (req, res) => {
     }, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
 
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return generalResponse(res, { thisMonthTasks: 0, thisMonthTasks: 0 }, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }

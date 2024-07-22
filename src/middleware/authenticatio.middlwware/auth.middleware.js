@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../../models/index');
 const { generalResponse } = require('../../helpers/response/general.response');
 const { STATUS_MESSAGE, STATUS_CODE } = require('../../helpers/constants/statuscode');
+const logger = require("../../config/pino.config");
 
 const authMiddleware = async (req, res, next) => {
 
@@ -17,7 +18,7 @@ const authMiddleware = async (req, res, next) => {
     next();
 
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return generalResponse(res, null, 'Token Expired or Server Error', STATUS_MESSAGE.UNAUTHORIZED, true, STATUS_CODE.UNAUTHORIZED)
   }
 

@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const Users = db.users;
 const { z } = require('zod');
 const { sendEmail } = require("../../services/sendmail");
+const logger = require("../../config/pino.config");
 
 const generateOtpSchema = z.object({
   email: z.string().min(1).email(),
@@ -38,7 +39,7 @@ exports.generateOtp = async (req, res) => {
 
     return generalResponse(res, { otp }, 'OTP sent successfully', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.SUCCESS);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     if (error instanceof z.ZodError) {
       return generalResponse(res, error, 'Please Enter Valid Input', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
     }
@@ -68,7 +69,7 @@ exports.verifyOtp = async (req, res) => {
     if (error instanceof z.ZodError) {
       return generalResponse(res, error, 'Please Enter Valid Input', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
     }
-    console.error(error);
+    logger.error(error);
     return generalResponse(res, null, 'Invalid request', STATUS_MESSAGE.BAD_REQUEST, true, STATUS_CODE.BAD_REQUEST)
   }
 }

@@ -4,6 +4,7 @@ const db = require("../../models/index");
 const TaskLog = db.tasks_time_logs;
 const { Op } = require('sequelize');
 const { startOfDay, startOfToday, endOfToday, endOfDay, differenceInMinutes } = require('date-fns');
+const logger = require("../../config/pino.config");
 
 exports.getLogsById = async (req,res) => {
   try {
@@ -108,7 +109,7 @@ exports.addTaskTimeLog = async (req, res) => {
       return generalResponse(res, null, 'Task ended', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.UPDATED);
     }
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR);
   }
 }

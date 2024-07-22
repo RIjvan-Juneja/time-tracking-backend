@@ -4,7 +4,7 @@ const db = require("../../models/index");
 const bcrypt = require('bcryptjs');
 const Users = db.users;
 const Roles = db.roles;
-
+const logger = require("../../config/pino.config");
 const { z } = require('zod');
 
 const registrationSchema = z.object({
@@ -51,7 +51,7 @@ exports.registration = async (req, res) => {
     if (error instanceof z.ZodError) {
       return generalResponse(res, error, 'Please Enter Valid Input', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
     }
-    console.log(error);
+    logger.error(error);
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 

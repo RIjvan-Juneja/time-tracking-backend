@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const Users = db.users;
 const { z } = require('zod');
 const jwt = require('jsonwebtoken');
+const logger = require("../../config/pino.config");
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -25,8 +26,13 @@ exports.login = async (req, res) => {
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+
+      await db.login_logs.create({ email, status: 'failed' });
+
       return generalResponse(res, null, 'Invalid email or password', STATUS_MESSAGE.UNAUTHORIZED, true, STATUS_CODE.UNAUTHORIZED)
     }
+
+    await db.login_logs.create({ email, status: 'success' });
 
     const token = jwt.sign({ id: user.id, roleId: user.role_id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
@@ -35,7 +41,7 @@ exports.login = async (req, res) => {
     if (error instanceof z.ZodError) {
       return generalResponse(res, error, 'Please Enter Valid Input', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
     }
-    console.error(error);
+    logger.error(error);
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
 
   }

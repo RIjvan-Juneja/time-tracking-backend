@@ -3,6 +3,8 @@ const { generalResponse } = require("../../helpers/response/general.response");
 const db = require("../../models/index");
 const Tasks = db.tasks;
 const Attachments = db.attachments;
+const logger = require("../../config/pino.config");
+
 
 exports.getTasks = async (req, res) => {
   try {
@@ -24,7 +26,7 @@ exports.getTasks = async (req, res) => {
     }
 
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }
@@ -67,7 +69,7 @@ exports.addTask = async (req, res) => {
     return generalResponse(res, null, 'Task and Attachment added successfully', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.CREATED)
 
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     await t.rollback();
     return generalResponse(res, null, error, STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
@@ -127,7 +129,7 @@ exports.editTask = async (req, res) => {
     return generalResponse(res, null, 'Task and Attachment added edited', STATUS_MESSAGE.SUCCESS, true, STATUS_CODE.SUCCESS)
 
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     await t.rollback();
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
@@ -165,7 +167,7 @@ exports.deleteTask = async (req, res) => {
     return generalResponse(res, null, 'Task and Attachment deleted', STATUS_MESSAGE.DELETED, true, STATUS_CODE.DELETE)
 
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     await t.rollback();
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
@@ -184,7 +186,7 @@ exports.getTasksByCategory = async (req, res) => {
     return generalResponse(res, tasks, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
 
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }
@@ -202,7 +204,7 @@ exports.getCategories = async (req, res) => {
     return generalResponse(res, formattedCategories, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
 
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
   }
 }
