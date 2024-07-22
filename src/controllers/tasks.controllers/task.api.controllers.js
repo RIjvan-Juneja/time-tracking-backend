@@ -19,6 +19,7 @@ exports.getTasks = async (req, res) => {
         where: { user_id: userId },
         include: [{ model: Attachments }, { model: db.category }, { model: db.tasks_time_logs }],
       });
+
       return generalResponse(res, tasks, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
     }
 
@@ -134,7 +135,6 @@ exports.editTask = async (req, res) => {
 }
 
 exports.deleteTask = async (req, res) => {
-  console.log("deleted Called");
   const t = await db.sequelize.transaction();
 
   try {

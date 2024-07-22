@@ -6,7 +6,6 @@ const { Op } = require('sequelize');
 const { startOfDay, startOfToday, endOfToday, endOfDay, differenceInMinutes } = require('date-fns');
 
 exports.getLogsById = async (req,res) => {
-  console.log("called");
   try {
     const task_id = req.params.id || 0;
     const user_id = req.user || 0;
@@ -46,13 +45,11 @@ exports.getLogsById = async (req,res) => {
         ],
       },
     });
-    console.log(taskLogs);
     return generalResponse(res, taskLogs, null, STATUS_MESSAGE.SUCCESS, false, STATUS_CODE.FETCH);
 
   } catch (error) {
     console.error(error);
     return generalResponse(res, null, 'Internal Server Error', STATUS_MESSAGE.ERROR, true, STATUS_CODE.ERROR)
-    // res.status(500).json({ error: 'An error occurred while fetching data' });
   }
 }
 
