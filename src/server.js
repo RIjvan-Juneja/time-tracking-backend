@@ -1,13 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const useRouter = require('./routes/index.route');
+const socket = require('socket.io')
 const PORT = process.env.PORT || 8080;
 const HOST = process.env.HOST || 'localhost';
 
 require('dotenv').config();
 
 const app = express();
-app.use(cors({ credentials: true, origin: ["http://localhost:5173","http://192.168.22.71:5173"] }));
+app.use(cors({ credentials: true, origin: ["http://localhost:5173", "http://192.168.22.71:5173"] }));
 // app.use(cors({ credentials: true, origin: "*" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -21,3 +22,19 @@ const server = app.listen(PORT, (err) => {
     console.log(`Server is : http://${HOST}:${PORT}/`);
   }
 })
+
+let count = 0;
+const io = socket(server, {
+  cors: { origin: '*' }
+});
+
+
+io.on('connection', (socket) => {
+  count++
+  console.log(count);
+  socket.on('req_for_log',(data) =>{
+    console.log(data,"called");
+    io.emit('res_for_log', data);
+  })
+  console.log("Soket server is running", socket.id)
+});
