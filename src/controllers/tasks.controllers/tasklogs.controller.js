@@ -55,7 +55,6 @@ exports.getLogsById = async (req,res) => {
 }
 
 exports.addTaskTimeLog = async (req, res) => {
-  console.log("called", req.body);
   try {
     const userId = req.user;
     const taskId = req.body.task_id;
@@ -82,7 +81,6 @@ exports.addTaskTimeLog = async (req, res) => {
         start_datetime: new Date(),
       };
 
-      console.log(payload,"**************payload***********");
 
       await TaskLog.create(payload);
 

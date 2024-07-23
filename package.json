@@ -28,6 +28,7 @@
     "path": "^0.12.7",
     "pino": "^9.3.1",
     "sequelize": "^6.37.3",
+    "socket.io": "^4.7.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
